@@ -146,7 +146,7 @@ onUnmounted(() => {
 
       <!-- Loading state -->
       <div v-if="loading" class="grid grid-cols-7 gap-px">
-        <Skeleton v-for="i in 42" :key="i" class="min-h-10 sm:min-h-20 rounded-radius-md" />
+        <Skeleton v-for="i in 42" :key="i" class="min-h-10 sm:min-h-24 rounded-radius-md" />
       </div>
 
       <!-- Day cells -->
