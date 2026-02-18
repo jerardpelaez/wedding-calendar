@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useEvents } from '@/composables/useEvents'
 import { useAuth } from '@/composables/useAuth'
 import { useCalendarUtils } from '@/composables/useCalendarUtils'
@@ -10,7 +10,7 @@ import { Calendar } from 'lucide-vue-next'
 import { withBase } from '@/lib/utils'
 import type { CalendarEvent } from '@/types/calendar'
 
-const { fetchYear, loading } = useEvents()
+const { fetchYear, loading, subscribe, unsubscribe } = useEvents()
 const { state, init } = useAuth()
 const { getDaysInMonth, getFirstDayOfMonth, formatDate, isToday } = useCalendarUtils()
 
@@ -35,11 +35,20 @@ const monthCards = computed(() =>
   }),
 )
 
+async function loadEvents() {
+  yearEvents.value = await fetchYear(YEAR)
+}
+
 onMounted(async () => {
   await init()
   if (state.value.isAuthenticated) {
-    yearEvents.value = await fetchYear(YEAR)
+    await loadEvents()
+    subscribe(() => loadEvents())
   }
+})
+
+onUnmounted(() => {
+  unsubscribe()
 })
 </script>
 
