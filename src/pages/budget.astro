@@ -1,0 +1,16 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import CalendarHeader from '@/components/astro/CalendarHeader.astro'
+import TheNavbar from '@/components/vue/layout/TheNavbar.vue'
+import BudgetDashboard from '@/components/vue/budget/BudgetDashboard.vue'
+---
+
+<BaseLayout title="Budget — Jerard & Joana Wedding 2026">
+  <TheNavbar client:only="vue" />
+
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+    <CalendarHeader title="Budget" subtitle="Wedding Expenses Tracker" />
+
+    <BudgetDashboard client:load />
+  </div>
+</BaseLayout>

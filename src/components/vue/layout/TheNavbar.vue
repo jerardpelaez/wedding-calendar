@@ -10,7 +10,7 @@ import {
   SheetTrigger,
   SheetClose,
 } from '@/components/ui/sheet'
-import { Menu, Calendar, LogOut, Heart, CalendarPlus } from 'lucide-vue-next'
+import { Menu, Calendar, LogOut, Heart, CalendarPlus, Wallet } from 'lucide-vue-next'
 import { withBase } from '@/lib/utils'
 import BulkEventForm from '@/components/vue/events/BulkEventForm.vue'
 
@@ -27,9 +27,10 @@ const currentMonth = today.getMonth() + 1
 const todayDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
 const navLinks = [
-  { href: withBase('/'), label: 'Year' },
-  { href: withBase(`/month/${currentMonth}`), label: 'This Month' },
-  { href: withBase(`/day/${todayDate}`), label: 'Today' },
+  { href: withBase('/'), label: 'Year', icon: Calendar },
+  { href: withBase(`/month/${currentMonth}`), label: 'This Month', icon: Calendar },
+  { href: withBase(`/day/${todayDate}`), label: 'Today', icon: Calendar },
+  { href: withBase('/budget'), label: 'Budget', icon: Wallet },
 ]
 
 async function handleSignOut() {
@@ -111,7 +112,7 @@ onMounted(() => {
                     :href="link.href"
                     class="flex items-center gap-3 px-3 py-3 text-sm text-foreground hover:bg-day-hover rounded-radius-md transition-colors"
                   >
-                    <Calendar class="w-4 h-4 text-muted" />
+                    <component :is="link.icon" class="w-4 h-4 text-muted" />
                     {{ link.label }}
                   </a>
                 </SheetClose>
