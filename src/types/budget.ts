@@ -9,6 +9,13 @@ export type BudgetCategory =
   | 'favors-gifts'
   | 'officiant-ceremony'
   | 'miscellaneous'
+  | 'honeymoon'
+  | 'home-furniture'
+  | 'appliances'
+  | 'legal-documents'
+  | 'savings-fund'
+  | 'home-renovation'
+  | 'other-personal'
 
 export interface Budget {
   id: string

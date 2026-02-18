@@ -22,6 +22,13 @@ import {
   Gift,
   Heart,
   MoreHorizontal,
+  Plane,
+  Sofa,
+  Tv,
+  FileText,
+  PiggyBank,
+  Hammer,
+  Briefcase,
 } from 'lucide-vue-next'
 import type { BudgetCategory, BudgetExpense } from '@/types/budget'
 import type { BudgetCategoryConfig } from '@/data/budget-categories'
@@ -38,6 +45,13 @@ const iconMap: Record<string, ReturnType<typeof UtensilsCrossed>> = {
   Gift,
   Heart,
   MoreHorizontal,
+  Plane,
+  Sofa,
+  Tv,
+  FileText,
+  PiggyBank,
+  Hammer,
+  Briefcase,
 }
 
 interface Props {

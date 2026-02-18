@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useAuth } from '@/composables/useAuth'
 import { useBudget } from '@/composables/useBudget'
-import { budgetCategories } from '@/data/budget-categories'
+import { budgetCategories, budgetCategoryGroups } from '@/data/budget-categories'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Wallet, Plus } from 'lucide-vue-next'
@@ -52,13 +52,17 @@ const isAuthenticated = computed(() => state.value.isAuthenticated)
 const isLoading = computed(() => state.value.isLoading)
 const hasBudget = computed(() => totalBudget.value > 0)
 
-const sortedCategories = computed(() =>
-  Object.entries(budgetCategories)
-    .sort(([, a], [, b]) => a.defaultSortOrder - b.defaultSortOrder)
-    .map(([key, config]) => ({
-      key: key as BudgetCategory,
-      config,
-    })),
+const groupedCategories = computed(() =>
+  budgetCategoryGroups.map((group) => ({
+    ...group,
+    categories: Object.entries(budgetCategories)
+      .filter(([, config]) => config.group === group.key)
+      .sort(([, a], [, b]) => a.defaultSortOrder - b.defaultSortOrder)
+      .map(([key, config]) => ({
+        key: key as BudgetCategory,
+        config,
+      })),
+  })),
 )
 
 async function handleSetBudget(amount: number) {
@@ -230,23 +234,26 @@ onUnmounted(() => {
           </Button>
         </div>
 
-        <!-- Category cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <BudgetCategoryCard
-            v-for="{ key, config } in sortedCategories"
-            :key="key"
-            :category="key"
-            :config="config"
-            :estimated="categoryEstimated(key)"
-            :spent="categorySpent(key)"
-            :paid="categoryPaid(key)"
-            :expenses="categoryExpenses(key)"
-            @edit-category="handleEditCategory"
-            @add-expense="handleAddExpense"
-            @edit-expense="handleEditExpense"
-            @delete-expense="handleDeleteExpense"
-            @toggle-expense-paid="handleTogglePaid"
-          />
+        <!-- Grouped category cards -->
+        <div v-for="group in groupedCategories" :key="group.key" class="space-y-4">
+          <h3 class="font-display text-lg font-semibold text-foreground">{{ group.label }}</h3>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <BudgetCategoryCard
+              v-for="{ key, config } in group.categories"
+              :key="key"
+              :category="key"
+              :config="config"
+              :estimated="categoryEstimated(key)"
+              :spent="categorySpent(key)"
+              :paid="categoryPaid(key)"
+              :expenses="categoryExpenses(key)"
+              @edit-category="handleEditCategory"
+              @add-expense="handleAddExpense"
+              @edit-expense="handleEditExpense"
+              @delete-expense="handleDeleteExpense"
+              @toggle-expense-paid="handleTogglePaid"
+            />
+          </div>
         </div>
       </template>
     </template>
