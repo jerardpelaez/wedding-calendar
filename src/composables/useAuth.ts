@@ -10,7 +10,7 @@ const state = ref<AuthState>({
   displayName: null,
 })
 
-let initialized = false
+let initPromise: Promise<void> | null = null
 
 export function useAuth() {
   async function resolveCouple(userId: string) {
@@ -27,31 +27,34 @@ export function useAuth() {
   }
 
   async function init() {
-    if (initialized) return
-    initialized = true
+    if (initPromise) return initPromise
 
-    const { data: { session } } = await supabase.auth.getSession()
+    initPromise = (async () => {
+      const { data: { session } } = await supabase.auth.getSession()
 
-    if (session?.user) {
-      state.value.isAuthenticated = true
-      state.value.userId = session.user.id
-      await resolveCouple(session.user.id)
-    }
-
-    state.value.isLoading = false
-
-    supabase.auth.onAuthStateChange(async (_event, session) => {
       if (session?.user) {
         state.value.isAuthenticated = true
         state.value.userId = session.user.id
         await resolveCouple(session.user.id)
-      } else {
-        state.value.isAuthenticated = false
-        state.value.userId = null
-        state.value.coupleId = null
-        state.value.displayName = null
       }
-    })
+
+      state.value.isLoading = false
+
+      supabase.auth.onAuthStateChange(async (_event, session) => {
+        if (session?.user) {
+          state.value.isAuthenticated = true
+          state.value.userId = session.user.id
+          await resolveCouple(session.user.id)
+        } else {
+          state.value.isAuthenticated = false
+          state.value.userId = null
+          state.value.coupleId = null
+          state.value.displayName = null
+        }
+      })
+    })()
+
+    return initPromise
   }
 
   async function signIn(email: string, password: string) {
