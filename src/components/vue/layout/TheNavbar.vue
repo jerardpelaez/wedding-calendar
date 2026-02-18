@@ -11,6 +11,7 @@ import {
   SheetClose,
 } from '@/components/ui/sheet'
 import { Menu, Calendar, LogOut, Heart } from 'lucide-vue-next'
+import { withBase } from '@/lib/utils'
 
 const { state, init, signOut } = useAuth()
 
@@ -24,14 +25,14 @@ const currentMonth = today.getMonth() + 1
 const todayDate = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
 
 const navLinks = [
-  { href: '/', label: 'Year' },
-  { href: `/month/${currentMonth}`, label: 'This Month' },
-  { href: `/day/${todayDate}`, label: 'Today' },
+  { href: withBase('/'), label: 'Year' },
+  { href: withBase(`/month/${currentMonth}`), label: 'This Month' },
+  { href: withBase(`/day/${todayDate}`), label: 'Today' },
 ]
 
 async function handleSignOut() {
   await signOut()
-  window.location.href = '/login'
+  window.location.href = withBase('/login')
 }
 
 onMounted(() => {
@@ -44,7 +45,7 @@ onMounted(() => {
     <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-14">
         <!-- Logo -->
-        <a href="/" class="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
+        <a :href="withBase('/')" class="flex items-center gap-2 text-foreground hover:text-primary transition-colors">
           <Heart class="w-5 h-5 text-primary" :stroke-width="2" />
           <span class="font-display text-lg font-semibold">J & J</span>
         </a>
@@ -74,7 +75,7 @@ onMounted(() => {
               <LogOut class="w-4 h-4" />
             </Button>
           </template>
-          <a v-else href="/login">
+          <a v-else :href="withBase('/login')">
             <Button variant="ghost" size="sm">Sign In</Button>
           </a>
         </div>
@@ -120,7 +121,7 @@ onMounted(() => {
                 </template>
                 <SheetClose v-else as-child>
                   <a
-                    href="/login"
+                    :href="withBase('/login')"
                     class="flex items-center gap-3 px-3 py-3 text-sm text-primary hover:bg-primary/5 rounded-radius-md"
                   >
                     Sign In

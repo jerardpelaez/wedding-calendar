@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { cn } from '@/lib/utils'
+import { cn, withBase } from '@/lib/utils'
 import type { CalendarEvent } from '@/types/calendar'
 import { eventCategories } from '@/data/event-categories'
 import { Camera } from 'lucide-vue-next'
@@ -24,7 +24,7 @@ const displayedDots = computed(() => {
 
 <template>
   <a
-    :href="`/day/${date}`"
+    :href="withBase(`/day/${date}`)"
     :class="cn(
       'relative flex flex-col items-center rounded-radius-md transition-colors min-h-10 sm:min-h-20 p-1 sm:p-2',
       isCurrentMonth ? 'hover:bg-day-hover' : 'opacity-40',

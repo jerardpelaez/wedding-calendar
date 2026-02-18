@@ -21,6 +21,7 @@ export function getStaticPaths() {
 }
 
 const { date, month, monthName, day } = Astro.props
+const base = import.meta.env.BASE_URL.replace(/\/$/, '')
 
 const displayDate = new Date(`${date}T00:00:00`).toLocaleDateString('en-US', {
   weekday: 'long',
@@ -33,7 +34,7 @@ const displayDate = new Date(`${date}T00:00:00`).toLocaleDateString('en-US', {
 <CalendarLayout
   title={`${displayDate} — Wedding Calendar`}
   heading={displayDate}
-  backHref={`/month/${month}`}
+  backHref={`${base}/month/${month}`}
   backLabel={monthName}
 >
   <TheNavbar client:load slot="navbar" />

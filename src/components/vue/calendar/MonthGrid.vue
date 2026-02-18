@@ -7,6 +7,7 @@ import { useAuth } from '@/composables/useAuth'
 import DayCell from './DayCell.vue'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ChevronLeft, ChevronRight } from 'lucide-vue-next'
+import { withBase } from '@/lib/utils'
 import { YEAR } from '@/data/months'
 import type { CalendarEvent } from '@/types/calendar'
 
@@ -88,9 +89,9 @@ const { direction } = useSwipe(gridRef)
 
 watch(direction, (dir) => {
   if (dir === 'left' && nextMonth.value) {
-    window.location.href = `/month/${nextMonth.value}`
+    window.location.href = withBase(`/month/${nextMonth.value}`)
   } else if (dir === 'right' && prevMonth.value) {
-    window.location.href = `/month/${prevMonth.value}`
+    window.location.href = withBase(`/month/${prevMonth.value}`)
   }
 })
 
@@ -112,7 +113,7 @@ onUnmounted(() => {
     <!-- Month navigation -->
     <div class="flex items-center justify-between mb-4">
       <a
-        :href="`/month/${prevMonth}`"
+        :href="withBase(`/month/${prevMonth}`)"
         class="p-2 rounded-radius-md hover:bg-day-hover transition-colors text-muted hover:text-foreground"
         aria-label="Previous month"
       >
@@ -122,7 +123,7 @@ onUnmounted(() => {
         {{ getMonthName(month) }} {{ year }}
       </h2>
       <a
-        :href="`/month/${nextMonth}`"
+        :href="withBase(`/month/${nextMonth}`)"
         class="p-2 rounded-radius-md hover:bg-day-hover transition-colors text-muted hover:text-foreground"
         aria-label="Next month"
       >

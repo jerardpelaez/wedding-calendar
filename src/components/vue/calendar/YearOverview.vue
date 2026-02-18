@@ -7,6 +7,7 @@ import { months, YEAR } from '@/data/months'
 import { eventCategories } from '@/data/event-categories'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Calendar } from 'lucide-vue-next'
+import { withBase } from '@/lib/utils'
 import type { CalendarEvent } from '@/types/calendar'
 
 const { fetchYear, loading } = useEvents()
@@ -53,7 +54,7 @@ onMounted(async () => {
     <a
       v-for="month in monthCards"
       :key="month.number"
-      :href="`/month/${month.number}`"
+      :href="withBase(`/month/${month.number}`)"
       class="group relative bg-surface rounded-radius-xl border border-border p-4 sm:p-5 hover:shadow-md hover:border-primary-light transition-all"
     >
       <div class="flex items-start justify-between">

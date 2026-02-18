@@ -13,13 +13,14 @@ export function getStaticPaths() {
 }
 
 const { monthData } = Astro.props
+const base = import.meta.env.BASE_URL.replace(/\/$/, '')
 ---
 
 <CalendarLayout
   title={`${monthData.name} 2026 — Wedding Calendar`}
   heading={monthData.name}
   subheading="2026"
-  backHref="/"
+  backHref={`${base}/`}
   backLabel="Year Overview"
 >
   <TheNavbar client:load slot="navbar" />

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useAuth } from '@/composables/useAuth'
+import { withBase } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -17,7 +18,7 @@ async function handleSubmit() {
 
   try {
     await signIn(email.value, password.value)
-    window.location.href = '/'
+    window.location.href = withBase('/')
   } catch (e) {
     error.value = e instanceof Error ? e.message : 'Sign in failed'
   } finally {
