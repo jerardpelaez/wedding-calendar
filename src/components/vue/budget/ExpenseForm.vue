@@ -19,13 +19,18 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Checkbox } from '@/components/ui/checkbox'
-import { budgetCategoryOptions } from '@/data/budget-categories'
 import type { BudgetCategory, BudgetExpense } from '@/types/budget'
+
+interface CategoryOption {
+  value: BudgetCategory
+  label: string
+}
 
 interface Props {
   open: boolean
   editExpense?: BudgetExpense | null
   defaultCategory?: BudgetCategory
+  categoryOptions: CategoryOption[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -41,7 +46,7 @@ const emit = defineEmits<{
     description: string
     amount: number
     is_paid: boolean
-    date: string
+    date: string | null
   }]
 }>()
 
@@ -89,7 +94,7 @@ async function handleSubmit() {
     description: description.value.trim(),
     amount: parsed,
     is_paid: isPaid.value,
-    date: date.value,
+    date: date.value || null,
   })
   saving.value = false
 }
@@ -111,7 +116,7 @@ async function handleSubmit() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem
-                v-for="opt in budgetCategoryOptions"
+                v-for="opt in categoryOptions"
                 :key="opt.value"
                 :value="opt.value"
               >

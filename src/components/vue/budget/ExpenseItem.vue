@@ -27,7 +27,7 @@ function formatDate(date: string | null): string {
 </script>
 
 <template>
-  <div class="flex items-center gap-3 py-2.5 px-3 rounded-radius-md hover:bg-day-hover transition-colors group">
+  <div class="flex items-center gap-3 py-2.5 px-3 rounded-radius-md hover:bg-day-hover transition-colors">
     <!-- Paid toggle -->
     <button
       class="flex-shrink-0"
@@ -71,7 +71,7 @@ function formatDate(date: string | null): string {
     </span>
 
     <!-- Actions -->
-    <div class="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+    <div class="flex items-center gap-0.5 flex-shrink-0">
       <Button
         variant="ghost"
         size="sm"

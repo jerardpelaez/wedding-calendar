@@ -206,6 +206,30 @@ export function useBudget() {
     expenses.value = expenses.value.filter((e) => e.id !== id)
   }
 
+  async function removeCategoryBudget(category: BudgetCategory) {
+    const coupleId = state.value.coupleId
+    if (!coupleId) throw new Error('Not authenticated')
+
+    const { error: expErr } = await supabase
+      .from('budget_expenses')
+      .delete()
+      .eq('couple_id', coupleId)
+      .eq('category', category)
+
+    if (expErr) throw expErr
+
+    const { error: catErr } = await supabase
+      .from('budget_categories')
+      .delete()
+      .eq('couple_id', coupleId)
+      .eq('category', category)
+
+    if (catErr) throw catErr
+
+    expenses.value = expenses.value.filter((e) => e.category !== category)
+    categories.value = categories.value.filter((c) => c.category !== category)
+  }
+
   async function toggleExpensePaid(id: string) {
     const expense = expenses.value.find((e) => e.id === id)
     if (!expense) return
@@ -281,6 +305,7 @@ export function useBudget() {
     createExpense,
     updateExpense,
     removeExpense,
+    removeCategoryBudget,
     toggleExpensePaid,
     subscribe,
     unsubscribe,

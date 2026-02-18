@@ -11,6 +11,7 @@ import { formatCurrency, cn } from '@/lib/utils'
 import {
   Pencil,
   Plus,
+  Trash2,
   ChevronDown,
   UtensilsCrossed,
   Camera,
@@ -67,6 +68,7 @@ const props = defineProps<Props>()
 
 const emit = defineEmits<{
   editCategory: [category: BudgetCategory]
+  deleteCategory: [category: BudgetCategory]
   addExpense: [category: BudgetCategory]
   editExpense: [expense: BudgetExpense]
   deleteExpense: [id: string]
@@ -123,6 +125,15 @@ const progressTextColor = computed(() => {
             @click="emit('editCategory', category)"
           >
             <Pencil class="w-3 h-3" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            class="h-7 w-7 p-0 text-muted hover:text-error"
+            aria-label="Delete category"
+            @click="emit('deleteCategory', category)"
+          >
+            <Trash2 class="w-3 h-3" />
           </Button>
           <Button
             variant="ghost"

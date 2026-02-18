@@ -14,6 +14,7 @@ import BudgetCategoryCard from './BudgetCategoryCard.vue'
 import BudgetForm from './BudgetForm.vue'
 import CategoryBudgetForm from './CategoryBudgetForm.vue'
 import ExpenseForm from './ExpenseForm.vue'
+import AddCategoryForm from './AddCategoryForm.vue'
 
 const { state, init } = useAuth()
 const {
@@ -33,6 +34,7 @@ const {
   createExpense,
   updateExpense,
   removeExpense,
+  removeCategoryBudget,
   toggleExpensePaid,
   subscribe,
   unsubscribe,
@@ -41,6 +43,8 @@ const {
 const budgetFormOpen = ref(false)
 const categoryFormOpen = ref(false)
 const expenseFormOpen = ref(false)
+const addCategoryFormOpen = ref(false)
+const addCategoryGroup = ref<'wedding' | 'personal'>('wedding')
 
 const editingCategory = ref<BudgetCategory | null>(null)
 const editingCategoryAmount = ref(0)
@@ -52,17 +56,37 @@ const isAuthenticated = computed(() => state.value.isAuthenticated)
 const isLoading = computed(() => state.value.isLoading)
 const hasBudget = computed(() => totalBudget.value > 0)
 
+function isCategoryActive(key: BudgetCategory): boolean {
+  return categoryEstimated(key) > 0 || categoryExpenses(key).length > 0
+}
+
+const activeCategoryOptions = computed(() =>
+  Object.entries(budgetCategories)
+    .filter(([key]) => isCategoryActive(key as BudgetCategory))
+    .sort(([, a], [, b]) => a.defaultSortOrder - b.defaultSortOrder)
+    .map(([key, config]) => ({ value: key as BudgetCategory, label: config.label })),
+)
+
+const hasActiveCategories = computed(() => activeCategoryOptions.value.length > 0)
+
 const groupedCategories = computed(() =>
-  budgetCategoryGroups.map((group) => ({
-    ...group,
-    categories: Object.entries(budgetCategories)
+  budgetCategoryGroups.map((group) => {
+    const allInGroup = Object.entries(budgetCategories)
       .filter(([, config]) => config.group === group.key)
       .sort(([, a], [, b]) => a.defaultSortOrder - b.defaultSortOrder)
       .map(([key, config]) => ({
         key: key as BudgetCategory,
         config,
-      })),
-  })),
+      }))
+
+    return {
+      ...group,
+      categories: allInGroup.filter(({ key }) => isCategoryActive(key)),
+      available: allInGroup
+        .filter(({ key }) => !isCategoryActive(key))
+        .map(({ key, config }) => ({ value: key, label: config.label })),
+    }
+  }),
 )
 
 async function handleSetBudget(amount: number) {
@@ -91,6 +115,38 @@ async function handleSaveCategoryBudget(data: { category: BudgetCategory; amount
   }
 }
 
+function handleOpenAddCategory(group: 'wedding' | 'personal') {
+  addCategoryGroup.value = group
+  addCategoryFormOpen.value = true
+}
+
+async function handleAddCategory(data: { category: BudgetCategory; amount: number }) {
+  try {
+    await upsertCategoryBudget(data.category, data.amount)
+    addCategoryFormOpen.value = false
+    toast.success('Category added')
+  } catch {
+    toast.error('Failed to add category')
+  }
+}
+
+async function handleDeleteCategory(category: BudgetCategory) {
+  const label = budgetCategories[category]?.label ?? category
+  const expenseCount = categoryExpenses(category).length
+  const message = expenseCount > 0
+    ? `Delete "${label}" and its ${expenseCount} expense${expenseCount === 1 ? '' : 's'}? This cannot be undone.`
+    : `Delete "${label}" budget allocation? This cannot be undone.`
+
+  if (!window.confirm(message)) return
+
+  try {
+    await removeCategoryBudget(category)
+    toast.success(`${label} deleted`)
+  } catch {
+    toast.error('Failed to delete category')
+  }
+}
+
 function handleAddExpense(category: BudgetCategory) {
   editingExpense.value = null
   defaultExpenseCategory.value = category
@@ -109,7 +165,7 @@ async function handleSaveExpense(data: {
   description: string
   amount: number
   is_paid: boolean
-  date: string
+  date: string | null
 }) {
   try {
     if (editingExpense.value) {
@@ -227,7 +283,8 @@ onUnmounted(() => {
           <Button
             size="sm"
             class="bg-primary text-surface hover:bg-primary-dark"
-            @click="handleAddExpense('miscellaneous')"
+            :disabled="!hasActiveCategories"
+            @click="handleAddExpense(activeCategoryOptions[0]?.value ?? 'miscellaneous')"
           >
             <Plus class="w-4 h-4 mr-1" />
             Add Expense
@@ -236,8 +293,20 @@ onUnmounted(() => {
 
         <!-- Grouped category cards -->
         <div v-for="group in groupedCategories" :key="group.key" class="space-y-4">
-          <h3 class="font-display text-lg font-semibold text-foreground">{{ group.label }}</h3>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="flex items-center justify-between">
+            <h3 class="font-display text-lg font-semibold text-foreground">{{ group.label }}</h3>
+            <Button
+              v-if="group.available.length > 0"
+              variant="outline"
+              size="sm"
+              class="text-xs"
+              @click="handleOpenAddCategory(group.key)"
+            >
+              <Plus class="w-3.5 h-3.5 mr-1" />
+              Add Category
+            </Button>
+          </div>
+          <div v-if="group.categories.length > 0" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <BudgetCategoryCard
               v-for="{ key, config } in group.categories"
               :key="key"
@@ -248,12 +317,16 @@ onUnmounted(() => {
               :paid="categoryPaid(key)"
               :expenses="categoryExpenses(key)"
               @edit-category="handleEditCategory"
+              @delete-category="handleDeleteCategory"
               @add-expense="handleAddExpense"
               @edit-expense="handleEditExpense"
               @delete-expense="handleDeleteExpense"
               @toggle-expense-paid="handleTogglePaid"
             />
           </div>
+          <p v-else class="text-sm text-muted py-4 text-center">
+            No categories added yet. Click "Add Category" to get started.
+          </p>
         </div>
       </template>
     </template>
@@ -279,7 +352,15 @@ onUnmounted(() => {
     :open="expenseFormOpen"
     :edit-expense="editingExpense"
     :default-category="defaultExpenseCategory"
+    :category-options="activeCategoryOptions"
     @update:open="expenseFormOpen = $event"
     @save="handleSaveExpense"
+  />
+
+  <AddCategoryForm
+    :open="addCategoryFormOpen"
+    :available-categories="groupedCategories.find((g) => g.key === addCategoryGroup)?.available ?? []"
+    @update:open="addCategoryFormOpen = $event"
+    @save="handleAddCategory"
   />
 </template>
