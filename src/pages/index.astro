@@ -1,0 +1,19 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import CalendarHeader from '@/components/astro/CalendarHeader.astro'
+import TheNavbar from '@/components/vue/layout/TheNavbar.vue'
+import AuthGuard from '@/components/vue/auth/AuthGuard.vue'
+import YearOverview from '@/components/vue/calendar/YearOverview.vue'
+---
+
+<BaseLayout title="Wedding Calendar 2026 — Jerard & Joana">
+  <TheNavbar client:load />
+
+  <div class="max-w-[1200px] mx-auto px-4 sm:px-6 lg:px-8">
+    <CalendarHeader title="2026" subtitle="Our Wedding Year" />
+
+    <AuthGuard client:load>
+      <YearOverview client:load />
+    </AuthGuard>
+  </div>
+</BaseLayout>

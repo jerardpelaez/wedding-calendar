@@ -1,0 +1,47 @@
+---
+import CalendarLayout from '@/layouts/CalendarLayout.astro'
+import TheNavbar from '@/components/vue/layout/TheNavbar.vue'
+import AuthGuard from '@/components/vue/auth/AuthGuard.vue'
+import EventList from '@/components/vue/events/EventList.vue'
+import PhotoGallery from '@/components/vue/photos/PhotoGallery.vue'
+import { months, YEAR } from '@/data/months'
+
+export function getStaticPaths() {
+  const paths = []
+  for (const month of months) {
+    for (let day = 1; day <= month.daysInMonth; day++) {
+      const dateStr = `${YEAR}-${String(month.number).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+      paths.push({
+        params: { date: dateStr },
+        props: { date: dateStr, month: month.number, monthName: month.name, day },
+      })
+    }
+  }
+  return paths
+}
+
+const { date, month, monthName, day } = Astro.props
+
+const displayDate = new Date(`${date}T00:00:00`).toLocaleDateString('en-US', {
+  weekday: 'long',
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+})
+---
+
+<CalendarLayout
+  title={`${displayDate} — Wedding Calendar`}
+  heading={displayDate}
+  backHref={`/month/${month}`}
+  backLabel={monthName}
+>
+  <TheNavbar client:load slot="navbar" />
+
+  <AuthGuard client:load>
+    <div class="space-y-8">
+      <EventList client:load date={date} />
+      <PhotoGallery client:visible date={date} />
+    </div>
+  </AuthGuard>
+</CalendarLayout>

@@ -1,0 +1,49 @@
+---
+import BaseLayout from './BaseLayout.astro'
+
+interface Props {
+  title: string
+  description?: string
+  backHref?: string
+  backLabel?: string
+  heading: string
+  subheading?: string
+}
+
+const {
+  title,
+  description,
+  backHref,
+  backLabel,
+  heading,
+  subheading,
+} = Astro.props
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="min-h-dvh flex flex-col">
+    <slot name="navbar" />
+
+    <header class="px-4 pt-4 pb-2 sm:px-6 lg:px-8 max-w-container-xl mx-auto w-full">
+      {backHref && (
+        <a
+          href={backHref}
+          class="inline-flex items-center gap-1.5 text-sm text-muted hover:text-foreground transition-colors mb-3"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          {backLabel ?? 'Back'}
+        </a>
+      )}
+      <h1 class="font-display text-3xl sm:text-4xl font-semibold text-foreground">
+        {heading}
+      </h1>
+      {subheading && (
+        <p class="mt-1 text-muted text-sm sm:text-base">{subheading}</p>
+      )}
+    </header>
+
+    <main class="flex-1 px-4 py-4 sm:px-6 lg:px-8 max-w-container-xl mx-auto w-full">
+      <slot />
+    </main>
+  </div>
+</BaseLayout>

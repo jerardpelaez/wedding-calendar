@@ -1,0 +1,24 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro'
+import LoginForm from '@/components/vue/auth/LoginForm.vue'
+---
+
+<BaseLayout title="Sign In — Wedding Calendar 2026">
+  <div class="min-h-dvh flex flex-col items-center justify-center px-4">
+    <div class="text-center mb-8">
+      <h1 class="font-display text-4xl sm:text-5xl font-semibold text-foreground">
+        J & J
+      </h1>
+      <p class="mt-2 font-accent text-lg text-muted tracking-wide">
+        Wedding Calendar 2026
+      </p>
+    </div>
+
+    <div class="w-full max-w-sm bg-surface rounded-radius-xl shadow-md p-6 sm:p-8 border border-border">
+      <h2 class="font-display text-xl font-semibold text-foreground mb-6 text-center">
+        Sign In
+      </h2>
+      <LoginForm client:load />
+    </div>
+  </div>
+</BaseLayout>

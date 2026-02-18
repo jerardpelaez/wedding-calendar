@@ -1,0 +1,30 @@
+---
+import CalendarLayout from '@/layouts/CalendarLayout.astro'
+import TheNavbar from '@/components/vue/layout/TheNavbar.vue'
+import AuthGuard from '@/components/vue/auth/AuthGuard.vue'
+import MonthGrid from '@/components/vue/calendar/MonthGrid.vue'
+import { months } from '@/data/months'
+
+export function getStaticPaths() {
+  return months.map((m) => ({
+    params: { month: String(m.number) },
+    props: { monthData: m },
+  }))
+}
+
+const { monthData } = Astro.props
+---
+
+<CalendarLayout
+  title={`${monthData.name} 2026 — Wedding Calendar`}
+  heading={monthData.name}
+  subheading="2026"
+  backHref="/"
+  backLabel="Year Overview"
+>
+  <TheNavbar client:load slot="navbar" />
+
+  <AuthGuard client:load>
+    <MonthGrid client:load month={monthData.number} />
+  </AuthGuard>
+</CalendarLayout>
