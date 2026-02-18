@@ -22,6 +22,21 @@ export function getStaticPaths() {
 const { date, month, monthName, day } = Astro.props
 const base = import.meta.env.BASE_URL.replace(/\/$/, '')
 
+function adjacentDate(dateStr: string, offset: number): string | undefined {
+  const d = new Date(`${dateStr}T12:00:00`)
+  d.setDate(d.getDate() + offset)
+  if (d.getFullYear() !== YEAR) return undefined
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const dd = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${dd}`
+}
+
+const prevDate = adjacentDate(date, -1)
+const nextDate = adjacentDate(date, 1)
+const prevHref = prevDate ? `${base}/day/${prevDate}` : undefined
+const nextHref = nextDate ? `${base}/day/${nextDate}` : undefined
+
 const displayDate = new Date(`${date}T00:00:00`).toLocaleDateString('en-US', {
   weekday: 'long',
   year: 'numeric',
@@ -35,6 +50,8 @@ const displayDate = new Date(`${date}T00:00:00`).toLocaleDateString('en-US', {
   heading={displayDate}
   backHref={`${base}/month/${month}`}
   backLabel={monthName}
+  prevHref={prevHref}
+  nextHref={nextHref}
 >
   <TheNavbar client:only="vue" slot="navbar" />
 
