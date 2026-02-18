@@ -1,7 +1,6 @@
 ---
 import CalendarLayout from '@/layouts/CalendarLayout.astro'
 import TheNavbar from '@/components/vue/layout/TheNavbar.vue'
-import AuthGuard from '@/components/vue/auth/AuthGuard.vue'
 import EventList from '@/components/vue/events/EventList.vue'
 import PhotoGallery from '@/components/vue/photos/PhotoGallery.vue'
 import { months, YEAR } from '@/data/months'
@@ -37,12 +36,10 @@ const displayDate = new Date(`${date}T00:00:00`).toLocaleDateString('en-US', {
   backHref={`${base}/month/${month}`}
   backLabel={monthName}
 >
-  <TheNavbar client:load slot="navbar" />
+  <TheNavbar client:only="vue" slot="navbar" />
 
-  <AuthGuard client:load>
-    <div class="space-y-8">
-      <EventList client:load date={date} />
-      <PhotoGallery client:visible date={date} />
-    </div>
-  </AuthGuard>
+  <div class="space-y-8">
+    <EventList client:load date={date} />
+    <PhotoGallery client:only="vue" date={date} />
+  </div>
 </CalendarLayout>
