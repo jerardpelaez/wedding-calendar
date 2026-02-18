@@ -116,6 +116,33 @@ export function useEvents() {
     return data as CalendarEvent
   }
 
+  async function createBulk(eventList: {
+    date: string
+    title: string
+    description?: string
+    time_start?: string
+    time_end?: string
+    category: EventCategory
+  }[]) {
+    const coupleId = state.value.coupleId
+    const userId = state.value.userId
+    if (!coupleId || !userId) throw new Error('Not authenticated')
+
+    const rows = eventList.map((event) => ({
+      couple_id: coupleId,
+      created_by: userId,
+      ...event,
+    }))
+
+    const { data, error: err } = await supabase
+      .from('events')
+      .insert(rows)
+      .select()
+
+    if (err) throw err
+    return data as CalendarEvent[]
+  }
+
   async function update(id: string, updates: Partial<Pick<CalendarEvent, 'title' | 'description' | 'time_start' | 'time_end' | 'category'>>) {
     const { data, error: err } = await supabase
       .from('events')
@@ -173,6 +200,7 @@ export function useEvents() {
     fetchMonth,
     fetchYear,
     create,
+    createBulk,
     update,
     remove,
     subscribe,

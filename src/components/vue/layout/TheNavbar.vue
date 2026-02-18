@@ -10,12 +10,14 @@ import {
   SheetTrigger,
   SheetClose,
 } from '@/components/ui/sheet'
-import { Menu, Calendar, LogOut, Heart } from 'lucide-vue-next'
+import { Menu, Calendar, LogOut, Heart, CalendarPlus } from 'lucide-vue-next'
 import { withBase } from '@/lib/utils'
+import BulkEventForm from '@/components/vue/events/BulkEventForm.vue'
 
 const { state, init, signOut } = useAuth()
 
 const mobileOpen = ref(false)
+const bulkFormOpen = ref(false)
 
 const isAuthenticated = computed(() => state.value.isAuthenticated)
 const displayName = computed(() => state.value.displayName)
@@ -65,6 +67,14 @@ onMounted(() => {
         <!-- Desktop Auth -->
         <div class="hidden sm:flex items-center gap-3">
           <template v-if="isAuthenticated">
+            <Button
+              size="sm"
+              class="bg-primary text-surface hover:bg-primary-dark"
+              @click="bulkFormOpen = true"
+            >
+              <CalendarPlus class="w-4 h-4 mr-1" />
+              Add Event
+            </Button>
             <span class="text-sm text-muted">{{ displayName }}</span>
             <Button
               variant="ghost"
@@ -105,6 +115,15 @@ onMounted(() => {
                     {{ link.label }}
                   </a>
                 </SheetClose>
+                <SheetClose v-if="isAuthenticated" as-child>
+                  <button
+                    class="flex items-center gap-3 px-3 py-3 text-sm text-primary hover:bg-primary/5 rounded-radius-md transition-colors"
+                    @click="bulkFormOpen = true"
+                  >
+                    <CalendarPlus class="w-4 h-4" />
+                    Add Event
+                  </button>
+                </SheetClose>
               </div>
               <div class="mt-auto pt-6 border-t border-border">
                 <template v-if="isAuthenticated">
@@ -134,4 +153,6 @@ onMounted(() => {
       </div>
     </div>
   </nav>
+
+  <BulkEventForm v-model:open="bulkFormOpen" />
 </template>

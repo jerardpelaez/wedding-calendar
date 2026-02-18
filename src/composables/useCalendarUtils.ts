@@ -47,6 +47,19 @@ export function useCalendarUtils() {
     })
   }
 
+  function generateDateRange(startDate: string, endDate: string): string[] {
+    const dates: string[] = []
+    const current = new Date(startDate + 'T00:00:00')
+    const end = new Date(endDate + 'T00:00:00')
+
+    while (current <= end) {
+      dates.push(toISODate(current))
+      current.setDate(current.getDate() + 1)
+    }
+
+    return dates
+  }
+
   return {
     getDaysInMonth,
     getFirstDayOfMonth,
@@ -57,5 +70,6 @@ export function useCalendarUtils() {
     getMonthName,
     getDayName,
     formatDisplayDate,
+    generateDateRange,
   }
 }
